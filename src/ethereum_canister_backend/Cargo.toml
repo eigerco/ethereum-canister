@@ -10,10 +10,8 @@ crate-type = ["cdylib"]
 [dependencies]
 candid = "0.8"
 ic-cdk = "0.7"
-ic-cdk-timers = "0.1" # Feel free to remove this dependency if you don't need timers
 
-#client = { workspace = true }
-#execution = { workspace = true }
+client = { workspace = true }
 config = { workspace = true }
 common = { workspace = true }
 

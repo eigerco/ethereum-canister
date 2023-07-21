@@ -2,9 +2,9 @@
 members = [
     "src/ethereum_canister_backend",
 ]
+resolver = "2"
 
 [workspace.dependencies]
-#client = { path = "../helios/client" }
+client = { path = "../helios/client" }
 common = { path = "../helios/common" }
 config = { path = "../helios/config" }
-#execution = { path = "../helios/execution" }
