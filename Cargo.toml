@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "src/ethereum_canister_backend",
+]
+
+[workspace.dependencies]
+#client = { path = "../helios/client" }
+common = { path = "../helios/common" }
+config = { path = "../helios/config" }
+#execution = { path = "../helios/execution" }

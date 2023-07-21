@@ -1,0 +1,23 @@
+[package]
+name = "ethereum_canister_backend"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.8"
+ic-cdk = "0.7"
+ic-cdk-timers = "0.1" # Feel free to remove this dependency if you don't need timers
+
+#client = { workspace = true }
+#execution = { workspace = true }
+config = { workspace = true }
+common = { workspace = true }
+
+getrandom = { version = "0.2.10", features = ["custom"] }
+rand_chacha = "0.3.1"
+rand_core = "0.6.4"
+rand = "0.8.5"
