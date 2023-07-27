@@ -3,7 +3,8 @@
     "ethereum_canister_backend": {
       "candid": "src/ethereum_canister_backend/ethereum_canister_backend.did",
       "package": "ethereum_canister_backend",
-      "type": "rust"
+      "type": "rust",
+      "optimize": "size"
     }
   },
   "defaults": {
