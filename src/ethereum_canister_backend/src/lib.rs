@@ -42,6 +42,8 @@ async fn setup(
     execution_rpc_url: String,
     checkpoint: String,
 ) -> Result<()> {
+    let _ = ic_logger::init_with_level(log::Level::Trace);
+
     let mut client: Client<ConfigDB> = ClientBuilder::new()
         .network(Network::MAINNET)
         .consensus_rpc(&consensus_rpc_url)
