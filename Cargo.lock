@@ -759,6 +759,8 @@ dependencies = [
  "config",
  "getrandom 0.2.10",
  "ic-cdk",
+ "ic-logger",
+ "log",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rand_core 0.6.4",
@@ -1341,6 +1343,16 @@ dependencies = [
  "serde",
  "serde_bytes",
  "slotmap",
+]
+
+[[package]]
+name = "ic-logger"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "616893dd349b1ea894b9dd90143a9c804a702e8a43877a67a1c8a6d12270dcb0"
+dependencies = [
+ "ic-cdk",
+ "log",
 ]
 
 [[package]]
