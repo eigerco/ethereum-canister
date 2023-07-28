@@ -78,11 +78,3 @@ async fn get_block_number() -> Result<Nat> {
 
     Ok(head_block_num.into())
 }
-
-// #[update]
-// async fn greet() -> String {
-//     let _guard = random::enter().await;
-
-//     let n: u32 = rand::random();
-//     format!("Hello, here is a random number: {}", n)
-// }

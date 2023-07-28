@@ -23,6 +23,7 @@ impl Drop for RngGuard {
     }
 }
 
+#[allow(unused)]
 pub async fn enter() -> RngGuard {
     let mut bytes = raw_rand().await.expect("failed to call raw_rand").0;
     let seed = bytes[..].try_into().expect("not 32 bytes");
