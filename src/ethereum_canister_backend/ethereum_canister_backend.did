@@ -6,20 +6,23 @@ type EthClientError = variant {
     NotInitialized : null;
 
     // Calling rpc method failed
-    RpcFailed : text;
+    RpcFailed : (text, text);
 };
 
-type SetupResult = variant {
+type VoidResult = variant {
     Ok : null;
     Err : EthClientError;
 };
 
-type BlockNumberResult = variant {
+type NatResult = variant {
     Ok : nat;
     Err : EthClientError;
 };
 
 service : {
-    "setup": (text, text, text) -> (SetupResult);
-    "get_block_number": () -> (BlockNumberResult);
+    "setup": (text, text, text) -> (VoidResult);
+    "get_block_number": () -> (NatResult) query;
+
+    // ERC20
+    "erc20_balance_of": (text, text) -> (NatResult);
 }

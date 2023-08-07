@@ -2,12 +2,17 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use candid::{CandidType, Nat};
+use ethers_core::types::Address;
 use helios_client::database::ConfigDB;
 use helios_client::{Client, ClientBuilder};
 use helios_config::Network;
-use ic_cdk::{init, update};
+use ic_cdk::{init, query, update};
 
+mod erc20;
 mod random;
+mod utils;
+
+use crate::utils::ToNat;
 
 thread_local! {
     static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
@@ -21,11 +26,17 @@ enum EthClientError {
     #[error("Client not initialized")]
     NotInitialized,
 
-    #[error("Rpc method failed: {0}")]
-    RpcFailed(String),
+    #[error("Rpc method failed: {0}: {1}")]
+    RpcFailed(&'static str, String),
 }
 
 type Result<T> = std::result::Result<T, EthClientError>;
+
+pub(crate) fn global_client() -> Result<Rc<Client<ConfigDB>>> {
+    HELIOS
+        .with(|helios| helios.borrow().clone())
+        .ok_or(EthClientError::NotInitialized)
+}
 
 #[init]
 async fn init() {
@@ -66,17 +77,22 @@ async fn setup(
     Ok(())
 }
 
-#[update]
+#[query]
 async fn get_block_number() -> Result<Nat> {
-    let head_block_num = HELIOS
-        .with(|client| client.borrow().clone())
-        .ok_or(EthClientError::NotInitialized)?
+    let helios = global_client()?;
+
+    let head_block_num = helios
         .get_block_number()
         .await
-        .map_err(|err| {
-            ic_cdk::println!("Get block number failed: {err}");
-            EthClientError::RpcFailed("get_block_number".into())
-        })?;
+        .map_err(|err| EthClientError::RpcFailed("get_block_number", err.to_string()))?;
 
     Ok(head_block_num.into())
+}
+
+#[update]
+async fn erc20_balance_of(erc20: String, wallet: String) -> Result<Nat> {
+    let erc20 = erc20.parse::<Address>().expect("TODO");
+    let wallet = wallet.parse::<Address>().expect("TODO");
+    let amount = erc20::balance_of(erc20, wallet).await?;
+    Ok(amount.to_nat())
 }
