@@ -1,28 +1,13 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-
 use candid::Nat;
-use ethers_core::types::Address;
-use helios_client::database::ConfigDB;
-use helios_client::{Client, ClientBuilder};
-use helios_config::Network;
 use ic_cdk::{init, query, update};
 
 mod erc20;
+mod erc721;
+mod helios;
 mod random;
 mod utils;
 
 use crate::utils::ToNat;
-
-thread_local! {
-    static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
-}
-
-pub(crate) fn global_client() -> Rc<Client<ConfigDB>> {
-    HELIOS
-        .with(|helios| helios.borrow().clone())
-        .expect("Client not initialized")
-}
 
 #[init]
 async fn init() {
@@ -37,23 +22,14 @@ async fn init() {
 async fn setup(consensus_rpc_url: String, execution_rpc_url: String, checkpoint: String) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
-    let mut client: Client<ConfigDB> = ClientBuilder::new()
-        .network(Network::MAINNET)
-        .consensus_rpc(&consensus_rpc_url)
-        .execution_rpc(&execution_rpc_url)
-        .checkpoint(&checkpoint)
-        .load_external_fallback()
-        .build()
-        .expect("Client setup failed");
-
-    client.start().await.expect("Failed to start the client");
-
-    HELIOS.with(|helios| *helios.borrow_mut() = Some(Rc::new(client)));
+    helios::start_client(&consensus_rpc_url, &execution_rpc_url, &checkpoint)
+        .await
+        .unwrap();
 }
 
 #[query]
 async fn get_block_number() -> Nat {
-    let helios = global_client();
+    let helios = helios::client();
 
     let head_block_num = helios
         .get_block_number()
@@ -64,17 +40,29 @@ async fn get_block_number() -> Nat {
 }
 
 #[update]
-async fn erc20_balance_of(erc20: String, wallet: String) -> Nat {
-    let erc20 = erc20
-        .parse::<Address>()
-        .expect("failed to parse erc20 address");
-    let wallet = wallet
-        .parse::<Address>()
-        .expect("failed to parse wallet address");
+async fn erc20_balance_of(erc20_contract: String, account: String) -> Nat {
+    let contract = erc20_contract
+        .parse()
+        .expect("failed to parse erc20_contract address");
+    let account = account.parse().expect("failed to parse account address");
 
-    let amount = erc20::balance_of(erc20, wallet)
+    let amount = erc20::balance_of(contract, account)
         .await
         .expect("erc20::balance_of failed");
 
     amount.to_nat()
+}
+
+#[update]
+async fn erc721_owner_of(erc721_contract: String, token_id: String) -> String {
+    let contract = erc721_contract
+        .parse()
+        .expect("Failed to parse erc721_contract address");
+    let token_id = token_id.parse().expect("Failed to parse token_id address");
+
+    let owner = erc721::owner_of(contract, token_id)
+        .await
+        .expect("erc721::owner_of failed");
+
+    format!("{:?}", owner)
 }

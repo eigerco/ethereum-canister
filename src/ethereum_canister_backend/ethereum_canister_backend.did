@@ -4,4 +4,7 @@ service : {
 
     // ERC20
     "erc20_balance_of": (text, text) -> (nat);
+
+    // ERC721
+    "erc721_owner_of": (text, text) -> (text);
 }
