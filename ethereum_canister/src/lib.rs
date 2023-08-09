@@ -16,7 +16,7 @@ async fn init() {
 
 /// Setup the helios client with given node urls
 ///
-/// dfx canister call ethereum_canister_backend setup \
+/// dfx canister call ethereum_canister setup \
 /// '("https://www.lightclientdata.org", "https://ethereum.publicnode.com")'
 #[update]
 async fn setup(consensus_rpc_url: String, execution_rpc_url: String) {
