@@ -1,28 +1,13 @@
-use std::cell::RefCell;
-use std::rc::Rc;
-
 use candid::Nat;
 use ethers_core::types::Address;
-use helios_client::database::ConfigDB;
-use helios_client::{Client, ClientBuilder};
-use helios_config::Network;
 use ic_cdk::{init, query, update};
 
 mod erc20;
+mod helios;
 mod random;
 mod utils;
 
 use crate::utils::ToNat;
-
-thread_local! {
-    static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
-}
-
-pub(crate) fn global_client() -> Rc<Client<ConfigDB>> {
-    HELIOS
-        .with(|helios| helios.borrow().clone())
-        .expect("Client not initialized")
-}
 
 #[init]
 async fn init() {
@@ -36,24 +21,14 @@ async fn init() {
 #[update]
 async fn setup(consensus_rpc_url: String, execution_rpc_url: String, checkpoint: String) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
-
-    let mut client: Client<ConfigDB> = ClientBuilder::new()
-        .network(Network::MAINNET)
-        .consensus_rpc(&consensus_rpc_url)
-        .execution_rpc(&execution_rpc_url)
-        .checkpoint(&checkpoint)
-        .load_external_fallback()
-        .build()
-        .expect("Client setup failed");
-
-    client.start().await.expect("Failed to start the client");
-
-    HELIOS.with(|helios| *helios.borrow_mut() = Some(Rc::new(client)));
+    helios::start(&consensus_rpc_url, &execution_rpc_url, &checkpoint)
+        .await
+        .unwrap();
 }
 
-#[query]
+#[query(composite = true)]
 async fn get_block_number() -> Nat {
-    let helios = global_client();
+    let helios = helios::client();
 
     let head_block_num = helios
         .get_block_number()

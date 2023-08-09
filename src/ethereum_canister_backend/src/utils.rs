@@ -2,7 +2,7 @@ use candid::Nat;
 use ethers_core::types::U256;
 use num_bigint::BigUint;
 
-pub trait ToNat {
+pub(crate) trait ToNat {
     fn to_nat(&self) -> Nat;
 }
 
