@@ -4,12 +4,14 @@ use std::rc::Rc;
 use ethers_contract::EthCall;
 use ethers_core::abi::{AbiDecode, AbiEncode};
 use ethers_core::types::Address;
-use eyre::{bail, Result, WrapErr};
+use eyre::{bail, eyre, Result, WrapErr};
 use helios_client::database::ConfigDB;
 use helios_client::{Client, ClientBuilder};
+use helios_common::http;
 use helios_common::types::BlockTag;
 use helios_config::Network;
 use helios_execution::types::CallOpts;
+use serde_json::Value;
 
 thread_local! {
     static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
@@ -21,19 +23,19 @@ pub(crate) fn client() -> Rc<Client<ConfigDB>> {
         .expect("Client not started")
 }
 
-pub(crate) async fn start_client(
-    consensus_rpc_url: &str,
-    execution_rpc_url: &str,
-    checkpoint: &str,
-) -> Result<()> {
+pub(crate) async fn start_client(consensus_rpc_url: &str, execution_rpc_url: &str) -> Result<()> {
     if HELIOS.with(|helios| helios.borrow().is_some()) {
         bail!("Client already started");
     }
 
+    let checkpoint = latest_checkpoint(consensus_rpc_url)
+        .await
+        .wrap_err("Fetching latest checkpoint failed")?;
+
     let mut client: Client<ConfigDB> = ClientBuilder::new()
         .network(Network::MAINNET)
-        .consensus_rpc(&consensus_rpc_url)
-        .execution_rpc(&execution_rpc_url)
+        .consensus_rpc(consensus_rpc_url)
+        .execution_rpc(execution_rpc_url)
         .checkpoint(&checkpoint)
         .load_external_fallback()
         .build()
@@ -67,4 +69,23 @@ where
     let ret = R::decode(bytes)?;
 
     Ok(ret)
+}
+
+async fn latest_checkpoint(consensus_rpc_url: &str) -> Result<String> {
+    let checkpoint_url = format!("{consensus_rpc_url}/eth/v1/beacon/headers/finalized");
+    let header_resp = http::get(&checkpoint_url)
+        .await
+        .wrap_err("Finalized header request failed")?;
+    let header: Value =
+        serde_json::from_slice(&header_resp.body).wrap_err("Reading json response failed")?;
+    let checkpoint = header
+        .pointer("/data/root")
+        .and_then(Value::as_str)
+        .ok_or_else(|| {
+            eyre!(
+                "No root found in response: {}",
+                std::str::from_utf8(&header_resp.body).expect("Non utf-8 json")
+            )
+        })?;
+    Ok(checkpoint.to_owned())
 }

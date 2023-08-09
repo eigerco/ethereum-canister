@@ -1,5 +1,6 @@
 service : {
-    "setup": (text, text, text) -> ();
+    "setup": (text, text) -> ();
+
     "get_block_number": () -> (nat) query;
 
     // ERC20
