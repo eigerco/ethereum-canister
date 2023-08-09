@@ -972,6 +972,7 @@ dependencies = [
  "ethers-contract",
  "ethers-core",
  "execution",
+ "eyre",
  "getrandom 0.2.10",
  "ic-cdk",
  "ic-logger",
@@ -980,7 +981,6 @@ dependencies = [
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "rand_core 0.6.4",
- "thiserror",
 ]
 
 [[package]]

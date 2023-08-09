@@ -6,6 +6,7 @@ resolver = "2"
 contracts-abi = { path = "./src/contracts-abi" }
 ethers-contract = { version = "2.0.8", default-features = false, features = ["abigen"] }
 ethers-core = "2.0.8"
+eyre = "0.6.8"
 helios_client = { package = "client", path = "../helios/client" }
 helios_common = { package = "common", path = "../helios/common" }
 helios_config = { package = "config", path = "../helios/config" }

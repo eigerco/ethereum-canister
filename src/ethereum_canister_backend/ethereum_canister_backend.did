@@ -1,28 +1,7 @@
-type EthClientError = variant {
-    // Couldn't set up the client
-    SetupFailed : null;
-
-    // Client wasn't initialized yet. Call `setup` first.
-    NotInitialized : null;
-
-    // Calling rpc method failed
-    RpcFailed : (text, text);
-};
-
-type VoidResult = variant {
-    Ok : null;
-    Err : EthClientError;
-};
-
-type NatResult = variant {
-    Ok : nat;
-    Err : EthClientError;
-};
-
 service : {
-    "setup": (text, text, text) -> (VoidResult);
-    "get_block_number": () -> (NatResult) query;
+    "setup": (text, text, text) -> ();
+    "get_block_number": () -> (nat) query;
 
     // ERC20
-    "erc20_balance_of": (text, text) -> (NatResult);
+    "erc20_balance_of": (text, text) -> (nat);
 }

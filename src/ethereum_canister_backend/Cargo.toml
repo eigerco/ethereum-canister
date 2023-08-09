@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 contracts-abi = { workspace = true }
 ethers-contract = { workspace = true }
 ethers-core = { workspace = true }
+eyre = { workspace = true }
 helios_client = { workspace = true }
 helios_common = { workspace = true }
 helios_config = { workspace = true }
@@ -25,4 +26,3 @@ num-bigint = "0.4.3"
 rand = "0.8.5"
 rand_chacha = "0.3.1"
 rand_core = "0.6.4"
-thiserror = "1.0.44"
