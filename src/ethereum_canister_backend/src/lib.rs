@@ -1,8 +1,8 @@
 use candid::Nat;
-use ethers_core::types::Address;
 use ic_cdk::{init, query, update};
 
 mod erc20;
+mod erc721;
 mod helios;
 mod random;
 mod utils;
@@ -21,12 +21,13 @@ async fn init() {
 #[update]
 async fn setup(consensus_rpc_url: String, execution_rpc_url: String, checkpoint: String) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
-    helios::start(&consensus_rpc_url, &execution_rpc_url, &checkpoint)
+
+    helios::start_client(&consensus_rpc_url, &execution_rpc_url, &checkpoint)
         .await
         .unwrap();
 }
 
-#[query(composite = true)]
+#[query]
 async fn get_block_number() -> Nat {
     let helios = helios::client();
 
@@ -39,17 +40,29 @@ async fn get_block_number() -> Nat {
 }
 
 #[update]
-async fn erc20_balance_of(erc20: String, wallet: String) -> Nat {
-    let erc20 = erc20
-        .parse::<Address>()
-        .expect("failed to parse erc20 address");
-    let wallet = wallet
-        .parse::<Address>()
-        .expect("failed to parse wallet address");
+async fn erc20_balance_of(erc20_contract: String, account: String) -> Nat {
+    let contract = erc20_contract
+        .parse()
+        .expect("failed to parse erc20_contract address");
+    let account = account.parse().expect("failed to parse account address");
 
-    let amount = erc20::balance_of(erc20, wallet)
+    let amount = erc20::balance_of(contract, account)
         .await
         .expect("erc20::balance_of failed");
 
     amount.to_nat()
+}
+
+#[update]
+async fn erc721_owner_of(erc721_contract: String, token_id: String) -> String {
+    let contract = erc721_contract
+        .parse()
+        .expect("Failed to parse erc721_contract address");
+    let token_id = token_id.parse().expect("Failed to parse token_id address");
+
+    let owner = erc721::owner_of(contract, token_id)
+        .await
+        .expect("erc721::owner_of failed");
+
+    format!("{:?}", owner)
 }

@@ -21,7 +21,7 @@ pub(crate) fn client() -> Rc<Client<ConfigDB>> {
         .expect("Client not started")
 }
 
-pub(crate) async fn start(
+pub(crate) async fn start_client(
     consensus_rpc_url: &str,
     execution_rpc_url: &str,
     checkpoint: &str,
