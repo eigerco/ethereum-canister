@@ -18,10 +18,6 @@ thread_local! {
     static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
 }
 
-#[derive(Debug, thiserror::Error)]
-#[error("Rpc method failed: {0}: {1}")]
-struct RpcError(&'static str, String);
-
 pub(crate) fn global_client() -> Rc<Client<ConfigDB>> {
     HELIOS
         .with(|helios| helios.borrow().clone())
