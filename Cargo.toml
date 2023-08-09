@@ -1,8 +1,24 @@
 [workspace]
-members = ["src/ethereum_canister_backend"]
+members = ["src/ethereum_canister_backend", "src/contracts-abi"]
 resolver = "2"
 
 [workspace.dependencies]
+contracts-abi = { path = "./src/contracts-abi" }
+ethers-contract = { version = "2.0.8", default-features = false, features = ["abigen"] }
+ethers-core = "2.0.8"
+eyre = "0.6.8"
 helios_client = { package = "client", path = "../helios/client" }
 helios_common = { package = "common", path = "../helios/common" }
 helios_config = { package = "config", path = "../helios/config" }
+helios_execution = { package = "execution", path = "../helios/execution" }
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+
+[patch.crates-io]
+ethers-contract = { git = "https://github.com/oblique/ethers-rs", rev = "3740d34" }
+ethers-contract-abigen = { git = "https://github.com/oblique/ethers-rs", rev = "3740d34" }
+ethers-contract-derive = { git = "https://github.com/oblique/ethers-rs", rev = "3740d34" }
+ethers-core = { git = "https://github.com/oblique/ethers-rs", rev = "3740d34" }

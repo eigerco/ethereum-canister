@@ -1,31 +1,28 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use candid::{CandidType, Nat};
+use candid::Nat;
+use ethers_core::types::Address;
 use helios_client::database::ConfigDB;
 use helios_client::{Client, ClientBuilder};
 use helios_config::Network;
-use ic_cdk::{init, update};
+use ic_cdk::{init, query, update};
 
+mod erc20;
 mod random;
+mod utils;
+
+use crate::utils::ToNat;
 
 thread_local! {
     static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
 }
 
-#[derive(Debug, CandidType, thiserror::Error)]
-enum EthClientError {
-    #[error("Couldn't set up the client")]
-    SetupFailed,
-
-    #[error("Client not initialized")]
-    NotInitialized,
-
-    #[error("Rpc method failed: {0}")]
-    RpcFailed(String),
+pub(crate) fn global_client() -> Rc<Client<ConfigDB>> {
+    HELIOS
+        .with(|helios| helios.borrow().clone())
+        .expect("Client not initialized")
 }
-
-type Result<T> = std::result::Result<T, EthClientError>;
 
 #[init]
 async fn init() {
@@ -37,11 +34,7 @@ async fn init() {
 // dfx canister call ethereum_canister_backend setup \
 // '("https://beacon-nd-995-871-887.p2pify.com:443/c9dce41bab3e120f541e4ffb748efa60/", "https://ethereum.publicnode.com", "0x2196fc70451d54e95061bfc2d756f3a8cf6e243f78dd475a8793da6afd17b423")'
 #[update]
-async fn setup(
-    consensus_rpc_url: String,
-    execution_rpc_url: String,
-    checkpoint: String,
-) -> Result<()> {
+async fn setup(consensus_rpc_url: String, execution_rpc_url: String, checkpoint: String) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
     let mut client: Client<ConfigDB> = ClientBuilder::new()
@@ -51,32 +44,37 @@ async fn setup(
         .checkpoint(&checkpoint)
         .load_external_fallback()
         .build()
-        .map_err(|err| {
-            ic_cdk::println!("Client setup failed: {err}");
-            EthClientError::SetupFailed
-        })?;
+        .expect("Client setup failed");
 
-    client.start().await.map_err(|err| {
-        ic_cdk::println!("Failed to start the client: {err}");
-        EthClientError::SetupFailed
-    })?;
+    client.start().await.expect("Failed to start the client");
 
     HELIOS.with(|helios| *helios.borrow_mut() = Some(Rc::new(client)));
+}
 
-    Ok(())
+#[query]
+async fn get_block_number() -> Nat {
+    let helios = global_client();
+
+    let head_block_num = helios
+        .get_block_number()
+        .await
+        .expect("get_block_number failed");
+
+    head_block_num.into()
 }
 
 #[update]
-async fn get_block_number() -> Result<Nat> {
-    let head_block_num = HELIOS
-        .with(|client| client.borrow().clone())
-        .ok_or(EthClientError::NotInitialized)?
-        .get_block_number()
-        .await
-        .map_err(|err| {
-            ic_cdk::println!("Get block number failed: {err}");
-            EthClientError::RpcFailed("get_block_number".into())
-        })?;
+async fn erc20_balance_of(erc20: String, wallet: String) -> Nat {
+    let erc20 = erc20
+        .parse::<Address>()
+        .expect("failed to parse erc20 address");
+    let wallet = wallet
+        .parse::<Address>()
+        .expect("failed to parse wallet address");
 
-    Ok(head_block_num.into())
+    let amount = erc20::balance_of(erc20, wallet)
+        .await
+        .expect("erc20::balance_of failed");
+
+    amount.to_nat()
 }

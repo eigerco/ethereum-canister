@@ -1,0 +1,8 @@
+[package]
+name = "contracts-abi"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ethers-contract = { workspace = true }
+ethers-core = { workspace = true }
