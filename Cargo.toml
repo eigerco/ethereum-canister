@@ -9,10 +9,10 @@ ethers-contract = { version = "2.0.8", default-features = false, features = [
 ] }
 ethers-core = "2.0.8"
 eyre = "0.6.8"
-helios_client = { package = "client", path = "../helios/client" }
-helios_common = { package = "common", path = "../helios/common" }
-helios_config = { package = "config", path = "../helios/config" }
-helios_execution = { package = "execution", path = "../helios/execution" }
+helios_client = { package = "client", git = "https://github.com/eigerco/helios", rev = "a7173b2" }
+helios_common = { package = "common", git = "https://github.com/eigerco/helios", rev = "a7173b2" }
+helios_config = { package = "config", git = "https://github.com/eigerco/helios", rev = "a7173b2" }
+helios_execution = { package = "execution", git = "https://github.com/eigerco/helios", rev = "a7173b2" }
 interface = { path = "src/interface" }
 
 [profile.release]

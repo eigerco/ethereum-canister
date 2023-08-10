@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use candid::types::{Compound, Serializer, Type};
 use candid::{CandidType, Nat};
 use ethers_core::types::{Address as EthersAddress, U256 as EthersU256};
@@ -46,6 +48,15 @@ impl From<EthersAddress> for Address {
 impl From<Address> for EthersAddress {
     fn from(value: Address) -> Self {
         value.0
+    }
+}
+
+impl FromStr for Address {
+    type Err = <EthersAddress as FromStr>::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let addr: EthersAddress = s.parse()?;
+        Ok(Self(addr))
     }
 }
 
@@ -118,6 +129,35 @@ impl From<U256> for Nat {
         Nat(BigUint::from_bytes_le(&bytes))
     }
 }
+
+macro_rules! impl_u256_from_primitives {
+    ($($typ:ty),+) => {
+        $(
+            impl ::core::convert::From<$typ> for crate::U256 {
+                fn from(value: $typ) -> Self {
+                    Self(value.into())
+                }
+            }
+        )+
+    };
+}
+
+macro_rules! impl_u256_try_from_primitives {
+    ($($typ:ty),+) => {
+        $(
+            impl ::core::convert::TryFrom<$typ> for crate::U256 {
+                type Error = <::ethers_core::types::U256 as TryFrom<$typ>>::Error;
+
+                fn try_from(value: $typ) -> ::core::result::Result<Self, Self::Error> {
+                    Ok(Self(value.try_into()?))
+                }
+            }
+        )+
+    };
+}
+
+impl_u256_from_primitives!(u8, u16, u32, u64, u128, usize);
+impl_u256_try_from_primitives!(i8, i16, i32, i64, i128, isize);
 
 #[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub struct SetupRequest {
