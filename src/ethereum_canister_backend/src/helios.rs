@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::rc::Rc;
+use std::str;
 
 use ethers_contract::EthCall;
 use ethers_core::abi::{AbiDecode, AbiEncode};
@@ -76,12 +77,11 @@ async fn latest_checkpoint(consensus_rpc_url: &str) -> Result<String> {
     let header_resp = http::get(&checkpoint_url)
         .await
         .wrap_err("Finalized header request failed")?;
-    let body = str::from_utf8(&header_resp).wrap_err("Non utf-8 response")?;
-    let header: Value =
-        serde_json::from_str(body).wrap_err("Reading json response failed")?;
+    let body = str::from_utf8(&header_resp.body).wrap_err("Non utf-8 response")?;
+    let header: Value = serde_json::from_str(body).wrap_err("Reading json response failed")?;
     let checkpoint = header
         .pointer("/data/root")
         .and_then(Value::as_str)
-        .ok_or_else(|| eyre!("No root found in response: {body}")))?;
+        .ok_or_else(|| eyre!("No root found in response: {body}"))?;
     Ok(checkpoint.to_owned())
 }
