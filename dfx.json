@@ -1,8 +1,8 @@
 {
   "canisters": {
-    "ethereum_canister_backend": {
-      "candid": "src/ethereum_canister_backend/ethereum_canister_backend.did",
-      "package": "ethereum_canister_backend",
+    "ethereum_canister": {
+      "candid": "ethereum_canister/candid.did",
+      "package": "ethereum_canister",
       "type": "rust",
       "optimize": "size"
     }

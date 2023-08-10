@@ -1,10 +1,12 @@
 [workspace]
-members = ["src/ethereum_canister_backend", "src/contracts-abi"]
+members = ["src/ethereum-canister", "src/contracts-abi"]
 resolver = "2"
 
 [workspace.dependencies]
-contracts-abi = { path = "./src/contracts-abi" }
-ethers-contract = { version = "2.0.8", default-features = false, features = ["abigen"] }
+contracts-abi = { path = "src/contracts-abi" }
+ethers-contract = { version = "2.0.8", default-features = false, features = [
+  "abigen",
+] }
 ethers-core = "2.0.8"
 eyre = "0.6.8"
 helios_client = { package = "client", path = "../helios/client" }

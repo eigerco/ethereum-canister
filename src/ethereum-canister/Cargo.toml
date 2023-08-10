@@ -1,5 +1,5 @@
 [package]
-name = "ethereum_canister_backend"
+name = "ethereum-canister"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
@@ -27,3 +27,8 @@ rand = "0.8.5"
 rand_chacha = "0.3.1"
 rand_core = "0.6.4"
 serde_json = "1.0.104"
+serde = "1.0.183"
+
+[dev-dependencies]
+temp-dir = "0.1.11"
+candid = { version = "0.9.2", features = ["parser"] }
