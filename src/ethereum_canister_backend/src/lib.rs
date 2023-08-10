@@ -14,17 +14,17 @@ async fn init() {
     ic_cdk::setup();
 }
 
-// Note: example call for test purposes (remove me)
-// the first url is pointed by 301 MOVED from https://www.lightclientdata.org
-// dfx canister call ethereum_canister_backend setup \
-// '("https://beacon-nd-995-871-887.p2pify.com:443/c9dce41bab3e120f541e4ffb748efa60/", "https://ethereum.publicnode.com", "0x2196fc70451d54e95061bfc2d756f3a8cf6e243f78dd475a8793da6afd17b423")'
+/// Setup the helios client with given node urls
+///
+/// dfx canister call ethereum_canister_backend setup \
+/// '("https://www.lightclientdata.org", "https://ethereum.publicnode.com")'
 #[update]
-async fn setup(consensus_rpc_url: String, execution_rpc_url: String, checkpoint: String) {
+async fn setup(consensus_rpc_url: String, execution_rpc_url: String) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
-    helios::start_client(&consensus_rpc_url, &execution_rpc_url, &checkpoint)
+    helios::start_client(&consensus_rpc_url, &execution_rpc_url)
         .await
-        .unwrap();
+        .expect("starting client failed");
 }
 
 #[query]
