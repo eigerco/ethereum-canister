@@ -995,32 +995,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ethereum-canister"
-version = "0.1.0"
-dependencies = [
- "candid",
- "client",
- "common",
- "config",
- "contracts-abi",
- "ethers-contract",
- "ethers-core",
- "execution",
- "eyre",
- "getrandom 0.2.10",
- "ic-cdk",
- "ic-logger",
- "log",
- "num-bigint",
- "rand 0.8.5",
- "rand_chacha 0.3.1",
- "rand_core 0.6.4",
- "serde",
- "serde_json",
- "temp-dir",
-]
-
-[[package]]
 name = "ethereum-types"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1048,6 +1022,32 @@ dependencies = [
  "primitive-types 0.12.1",
  "scale-info",
  "uint 0.9.5",
+]
+
+[[package]]
+name = "ethereum_canister"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "client",
+ "common",
+ "config",
+ "contracts-abi",
+ "ethers-contract",
+ "ethers-core",
+ "execution",
+ "eyre",
+ "getrandom 0.2.10",
+ "ic-cdk",
+ "ic-logger",
+ "log",
+ "num-bigint",
+ "rand 0.8.5",
+ "rand_chacha 0.3.1",
+ "rand_core 0.6.4",
+ "serde",
+ "serde_json",
+ "temp-dir",
 ]
 
 [[package]]
