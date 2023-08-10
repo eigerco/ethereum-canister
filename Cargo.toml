@@ -1,9 +1,9 @@
 [workspace]
-members = ["ethereum_canister", "contracts-abi"]
+members = ["src/ethereum-canister", "src/contracts-abi"]
 resolver = "2"
 
 [workspace.dependencies]
-contracts-abi = { path = "./contracts-abi" }
+contracts-abi = { path = "src/contracts-abi" }
 ethers-contract = { version = "2.0.8", default-features = false, features = [
   "abigen",
 ] }
