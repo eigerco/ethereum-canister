@@ -1,11 +1,26 @@
-service : {
-    "setup": (text, text) -> ();
+type address = text;
+type u256 = nat;
 
+type setup_request = record {
+    consensus_rpc_url: text;
+    execution_rpc_url: text;
+};
+
+type erc20_balance_of_request = record {
+    contract: address;
+    account: address;
+};
+
+type erc721_owner_of_request = record {
+    contract: address;
+    token_id: u256;
+};
+
+service : {
+    "setup": (setup_request) -> ();
     "get_block_number": () -> (nat) query;
 
-    // ERC20
-    "erc20_balance_of": (text, text) -> (nat);
+    "erc20_balance_of": (erc20_balance_of_request) -> (u256);
 
-    // ERC721
-    "erc721_owner_of": (text, text) -> (text);
+    "erc721_owner_of": (erc721_owner_of_request) -> (address);
 }

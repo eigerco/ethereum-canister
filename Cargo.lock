@@ -1040,6 +1040,7 @@ dependencies = [
  "getrandom 0.2.10",
  "ic-cdk",
  "ic-logger",
+ "interface",
  "log",
  "num-bigint",
  "rand 0.8.5",
@@ -1834,6 +1835,17 @@ name = "inlinable_string"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8fae54786f62fb2918dcfae3d568594e50eb9b5c25bf04371af6fe7516452fb"
+
+[[package]]
+name = "interface"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ethers-core",
+ "num-bigint",
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "ipnet"

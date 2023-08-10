@@ -1,5 +1,5 @@
 [workspace]
-members = ["src/ethereum-canister", "src/contracts-abi"]
+members = ["src/ethereum-canister", "src/contracts-abi", "src/interface"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -13,6 +13,7 @@ helios_client = { package = "client", path = "../helios/client" }
 helios_common = { package = "common", path = "../helios/common" }
 helios_config = { package = "config", path = "../helios/config" }
 helios_execution = { package = "execution", path = "../helios/execution" }
+interface = { path = "src/interface" }
 
 [profile.release]
 opt-level = "z"

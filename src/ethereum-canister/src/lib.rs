@@ -1,13 +1,12 @@
 use candid::Nat;
 use ic_cdk::{init, query, update};
+use interface::{Address, Erc20OwnerOfRequest, Erc721OwnerOfRequest, SetupRequest, U256};
 
 mod erc20;
 mod erc721;
 mod helios;
 mod random;
 mod utils;
-
-use crate::utils::ToNat;
 
 #[init]
 async fn init() {
@@ -16,13 +15,14 @@ async fn init() {
 
 /// Setup the helios client with given node urls
 ///
+///
 /// dfx canister call ethereum_canister setup \
-/// '("https://www.lightclientdata.org", "https://ethereum.publicnode.com")'
+///     'record { execution_rpc_url = "https://ethereum.publicnode.com"; consensus_rpc_url = "https://www.lightclientdata.org" }'
 #[update]
-async fn setup(consensus_rpc_url: String, execution_rpc_url: String) {
+async fn setup(request: SetupRequest) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
-    helios::start_client(&consensus_rpc_url, &execution_rpc_url)
+    helios::start_client(&request.consensus_rpc_url, &request.execution_rpc_url)
         .await
         .expect("starting client failed");
 }
@@ -40,29 +40,17 @@ async fn get_block_number() -> Nat {
 }
 
 #[update]
-async fn erc20_balance_of(erc20_contract: String, account: String) -> Nat {
-    let contract = erc20_contract
-        .parse()
-        .expect("failed to parse erc20_contract address");
-    let account = account.parse().expect("failed to parse account address");
-
-    let amount = erc20::balance_of(contract, account)
+async fn erc20_balance_of(request: Erc20OwnerOfRequest) -> U256 {
+    erc20::balance_of(request.contract.into(), request.account.into())
         .await
-        .expect("erc20::balance_of failed");
-
-    amount.to_nat()
+        .expect("erc20::balance_of failed")
+        .into()
 }
 
 #[update]
-async fn erc721_owner_of(erc721_contract: String, token_id: String) -> String {
-    let contract = erc721_contract
-        .parse()
-        .expect("Failed to parse erc721_contract address");
-    let token_id = token_id.parse().expect("Failed to parse token_id address");
-
-    let owner = erc721::owner_of(contract, token_id)
+async fn erc721_owner_of(request: Erc721OwnerOfRequest) -> Address {
+    erc721::owner_of(request.contract.into(), request.token_id.into())
         .await
-        .expect("erc721::owner_of failed");
-
-    format!("{:?}", owner)
+        .expect("erc721::owner_of failed")
+        .into()
 }
