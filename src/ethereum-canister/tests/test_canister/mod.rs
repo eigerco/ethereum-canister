@@ -1,11 +1,6 @@
-use std::fs::File;
-
 use candid::{utils::ArgumentEncoder, IDLArgs};
 use eyre::{ensure, Result, WrapErr};
-use serde_json::{json, Value};
 use temp_dir::TempDir;
-
-static DFX_JSON: &str = include_str!("../../../../dfx.json");
 
 const DEFAULT_CONSENSUS_RPC: &str = "https://www.lightclientdata.org";
 const DEFAULT_EXECUTION_RPC: &str = "https://ethereum.publicnode.com";
@@ -31,7 +26,7 @@ pub struct TestCanister {
 }
 
 impl TestCanister {
-    pub fn deploy() -> Self {
+    pub fn deploy(name: &str) -> Self {
         let temp_dir = TempDir::new().unwrap();
 
         // setup the tempdir
@@ -39,27 +34,20 @@ impl TestCanister {
         make_symlink(&temp_dir, "target");
         make_symlink(&temp_dir, "Cargo.toml");
         make_symlink(&temp_dir, "Cargo.lock");
-
-        let name = format!("ethereum_canister_{}", rand::random::<u64>());
-
-        // rename the canister in dfx.json
-        let mut dfx_config: Value = serde_json::from_str(DFX_JSON).unwrap();
-        let ethereum_canister = dfx_config["canisters"]["ethereum_canister"].take();
-        dfx_config["canisters"] = json!({ name.as_str(): ethereum_canister });
-
-        // create dfx.json
-        let dfx_json = File::create(temp_dir.child("dfx.json")).unwrap();
-        serde_json::to_writer_pretty(dfx_json, &dfx_config).unwrap();
+        make_symlink(&temp_dir, "dfx.json");
 
         // deploy
-        let canister = TestCanister { temp_dir, name };
-        canister.run_dfx(&["deploy"]).unwrap();
+        let canister = TestCanister {
+            temp_dir,
+            name: name.to_owned(),
+        };
+        canister.run_dfx(&["deploy", name]).unwrap();
 
         canister
     }
 
-    pub fn deploy_and_setup() -> Self {
-        let canister = Self::deploy();
+    pub fn setup_ethereum_canister() -> Self {
+        let canister = Self::deploy("ethereum_canister");
         let request = interface::SetupRequest {
             consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
             execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),

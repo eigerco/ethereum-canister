@@ -6,7 +6,7 @@ use crate::test_canister::{call_decode, TestCanister};
 
 #[test]
 fn get_block_number() {
-    let canister = TestCanister::deploy_and_setup();
+    let canister = TestCanister::setup_ethereum_canister();
 
     let block_num: (Nat,) = call_decode!(canister, "get_block_number", ()).unwrap();
     assert!(block_num.0 > 17880732u128);
@@ -17,7 +17,7 @@ mod erc20 {
 
     #[test]
     fn balance_of() {
-        let canister = TestCanister::deploy_and_setup();
+        let canister = TestCanister::setup_ethereum_canister();
 
         let request = interface::Erc20OwnerOfRequest {
             contract: "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdt
@@ -38,7 +38,7 @@ mod erc721 {
 
     #[test]
     fn owner_of() {
-        let canister = TestCanister::deploy_and_setup();
+        let canister = TestCanister::setup_ethereum_canister();
 
         let request = interface::Erc721OwnerOfRequest {
             contract: "0x5Af0D9827E0c53E4799BB226655A1de152A425a5" // milady
