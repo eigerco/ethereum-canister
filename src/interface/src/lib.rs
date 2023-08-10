@@ -119,19 +119,19 @@ impl From<U256> for Nat {
     }
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub struct SetupRequest {
     pub consensus_rpc_url: String,
     pub execution_rpc_url: String,
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub struct Erc20OwnerOfRequest {
     pub contract: Address,
     pub account: Address,
 }
 
-#[derive(Debug, Clone, CandidType, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub struct Erc721OwnerOfRequest {
     pub contract: Address,
     pub token_id: U256,
