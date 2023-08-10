@@ -1,0 +1,11 @@
+[package]
+name = "interface"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+candid = "0.9.3"
+ethers-core = { workspace = true }
+num-bigint = { version = "0.4.3", default-features = false }
+serde = { version = "1.0.183", features = ["derive"] }
+thiserror = "1.0.44"
