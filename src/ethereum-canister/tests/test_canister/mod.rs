@@ -32,16 +32,6 @@ impl TestCanister {
         canister
     }
 
-    pub fn setup_ethereum_canister() -> Self {
-        let canister = Self::deploy("ethereum_canister");
-        let request = interface::SetupRequest {
-            consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
-            execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
-        };
-        let _: () = call!(canister, "setup", request).unwrap();
-        canister
-    }
-
     pub fn call(&self, method: &str, args: impl ArgumentEncoder) -> Result<Vec<u8>> {
         // convert arguments into format understood by `dfx`
         let args = candid::utils::encode_args(args).wrap_err("encoding args")?;
@@ -87,6 +77,16 @@ impl Drop for TestCanister {
     fn drop(&mut self) {
         self.remove()
     }
+}
+
+pub fn setup_ethereum_canister() -> TestCanister {
+    let canister = TestCanister::deploy("ethereum_canister");
+    let request = interface::SetupRequest {
+        consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
+        execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
+    };
+    let _: () = call!(canister, "setup", request).unwrap();
+    canister
 }
 
 /// A helper macro that allows calling canister methods with single and multiple arguments
