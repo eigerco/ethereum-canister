@@ -5,20 +5,6 @@ use temp_dir::TempDir;
 const DEFAULT_CONSENSUS_RPC: &str = "https://www.lightclientdata.org";
 const DEFAULT_EXECUTION_RPC: &str = "https://ethereum.publicnode.com";
 
-// NOTE: we can't just decode from inside the `call` because decode_args
-// returns ArgumentDecoder<'a> where 'a lifetime would be tied to the output we're
-// parsing, which would be dropped on return.
-// The reason for this is that ArgumentDecoder allows decoding by ref eg. to (&str,)
-macro_rules! call_decode {
-    ($canister:expr, $method:expr, $args:expr) => {{
-        $canister.call($method, $args).and_then(|output| {
-            ::candid::utils::decode_args(&output).map_err(|err| ::eyre::eyre!(err))
-        })
-    }};
-}
-
-pub(crate) use call_decode;
-
 #[derive(Debug)]
 pub struct TestCanister {
     name: String,
@@ -52,21 +38,26 @@ impl TestCanister {
             consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
             execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
         };
-        canister.call("setup", (request,)).unwrap();
+        let _: () = call!(canister, "setup", request).unwrap();
         canister
     }
 
-    pub fn call<Args: ArgumentEncoder>(&self, method: &str, args: Args) -> Result<Vec<u8>> {
+    pub fn call(&self, method: &str, args: impl ArgumentEncoder) -> Result<Vec<u8>> {
+        // convert arguments into format understood by `dfx`
         let args = candid::utils::encode_args(args).wrap_err("encoding args")?;
-        let args = IDLArgs::from_bytes(&args).wrap_err("decoding args")?;
+        let args = IDLArgs::from_bytes(&args).wrap_err("decoding dfx args")?;
 
         let stdout = self
             .run_dfx(&["canister", "call", &self.name, method, &args.to_string()])
             .wrap_err(format!("calling '{method} {args}'"))?;
 
+        // convert results from the format understood by `dfx`
+        // to the candid binary representation
+        // note: decoding here to the correct type is not possible as decoding
+        //       binds the result's lifetime to the lifetime of output
+        //       this is because decoding supports also reference types
         let stdout = std::str::from_utf8(&stdout).wrap_err("decoding output")?;
         let output: IDLArgs = stdout.parse().wrap_err("parsing output")?;
-
         output.to_bytes().wrap_err("encoding to candid")
     }
 
@@ -98,6 +89,27 @@ impl Drop for TestCanister {
     }
 }
 
+/// A helper macro that allows calling canister methods with single and multiple arguments
+/// and decodes the results.
+macro_rules! call {
+    ($canister:expr, $method:expr, ($($arg:expr),*)) => {{
+        let result = $canister
+            .call($method, ($($arg),*));
+        crate::test_canister::call!(@decode, result)
+
+    }};
+    ($canister:expr, $method:expr, $arg:expr) => {{
+        let result = $canister
+            .call($method, ($arg,));
+        crate::test_canister::call!(@decode, result)
+    }};
+    (@decode, $result:expr) => {
+        $result.and_then(|output| {
+            ::candid::utils::decode_args(&output).map_err(|err| ::eyre::eyre!(err))
+        })
+    }
+}
+
 fn make_symlink(temp_dir: &TempDir, name: &str) {
     #[cfg(not(target_family = "unix"))]
     {
@@ -111,3 +123,6 @@ fn make_symlink(temp_dir: &TempDir, name: &str) {
         std::os::unix::fs::symlink(path, temp_dir.child(name)).unwrap();
     }
 }
+
+// this has to come after macro definitions
+pub(crate) use call;

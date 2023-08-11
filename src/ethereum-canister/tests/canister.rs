@@ -2,13 +2,13 @@ use candid::Nat;
 
 mod test_canister;
 
-use crate::test_canister::{call_decode, TestCanister};
+use crate::test_canister::{call, TestCanister};
 
 #[test]
 fn get_block_number() {
     let canister = TestCanister::setup_ethereum_canister();
 
-    let block_num: (Nat,) = call_decode!(canister, "get_block_number", ()).unwrap();
+    let block_num: (Nat,) = call!(canister, "get_block_number", ()).unwrap();
     assert!(block_num.0 > 17880732u128);
 }
 
@@ -27,7 +27,7 @@ mod erc20 {
                 .parse()
                 .unwrap(),
         };
-        let _: (Nat,) = call_decode!(canister, "erc20_balance_of", (request,)).unwrap();
+        let _: (Nat,) = call!(canister, "erc20_balance_of", request).unwrap();
     }
 }
 
@@ -47,7 +47,7 @@ mod erc721 {
             token_id: 7773_u32.into(),
         };
 
-        let owner: (String,) = call_decode!(canister, "erc721_owner_of", (request,)).unwrap();
+        let owner: (String,) = call!(canister, "erc721_owner_of", request).unwrap();
         owner.0.parse::<Address>().unwrap();
     }
 }
