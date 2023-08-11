@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Run format
+      run: cargo fmt -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up cargo cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys:
+          cargo-${{ hashFiles('**/Cargo.lock') }}
+          cargo-
+
+    - name: Run clippy
+      run: cargo clippy --all -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Set up cargo cache
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys:
+          cargo-${{ hashFiles('**/Cargo.lock') }}
+          cargo-
+
+    - name: Install nextest
+      uses: taiki-e/install-action@nextest
+
+    - name: Set up dfx
+      uses: aviate-labs/setup-dfx@v0.2.6
+      with:
+        dfx-version: 0.14.3
+
+    - name: Build wasm
+      run: cargo build --release
+
+    - name: Run tests
+      run: |
+        dfx identity new gh_action --storage-mode plaintext
+        dfx identity use gh_action
+        dfx start --background --artificial-delay 5 --clean
+        cargo nextest run --target x86_64-unknown-linux-gnu
