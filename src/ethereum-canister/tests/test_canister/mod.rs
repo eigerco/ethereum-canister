@@ -39,7 +39,7 @@ impl TestCanister {
 
         let stdout = self
             .run_dfx(&["canister", "call", &self.name, method, &args.to_string()])
-            .wrap_err(format!("calling '{method} {args}'"))?;
+            .wrap_err_with(|| format!("calling '{method} {args}'"))?;
 
         // convert results from the format understood by `dfx`
         // to the candid binary representation
@@ -63,7 +63,7 @@ impl TestCanister {
             .args(args)
             .current_dir(self.temp_dir.path())
             .output()
-            .wrap_err(format!("executing dfx {args:?}"))?;
+            .wrap_err_with(|| format!("executing dfx {args:?}"))?;
         ensure!(
             output.status.success(),
             "dfx {args:?} failed: {}",
