@@ -3,12 +3,12 @@ use std::cell::RefCell;
 use candid::Nat;
 use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
 use ic_cdk_timers::set_timer;
-use interface::{Address, Erc20OwnerOfRequest, Erc721OwnerOfRequest, SetupRequest, U256};
-use log::debug;
+use interface::{Address, Erc20OwnerOfRequest, Erc721OwnerOfRequest, Network, SetupRequest, U256};
+use log::{debug, error};
 
 use crate::stable_memory::{
     init_stable_cell_default, load_static_string, save_static_string, StableCell,
-    LAST_CHECKPOINT_ID, LAST_CONSENSUS_RPC_URL_ID, LAST_EXECUTION_RPC_URL_ID,
+    LAST_CHECKPOINT_ID, LAST_CONSENSUS_RPC_URL_ID, LAST_EXECUTION_RPC_URL_ID, LAST_NETWORK_ID,
 };
 
 mod erc20;
@@ -19,6 +19,7 @@ mod stable_memory;
 mod utils;
 
 thread_local! {
+    static LAST_NETWORK: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_NETWORK_ID));
     static LAST_CONSENSUS_RPC_URL: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_CONSENSUS_RPC_URL_ID));
     static LAST_EXECUTION_RPC_URL: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_EXECUTION_RPC_URL_ID));
     static LAST_CHECKPOINT: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_CHECKPOINT_ID));
@@ -31,17 +32,27 @@ async fn init() {
 
 /// Setup the helios client with given node urls
 ///
+/// Mainnet:
+///   dfx canister call ethereum_canister setup \
+///     'record { network = variant { Mainnet }; execution_rpc_url = "https://ethereum.publicnode.com"; consensus_rpc_url = "https://www.lightclientdata.org" }'
 ///
-/// dfx canister call ethereum_canister setup \
-///     'record { execution_rpc_url = "https://ethereum.publicnode.com"; consensus_rpc_url = "https://www.lightclientdata.org" }'
+/// Goerli:
+///   dfx canister call ethereum_canister setup \
+///     'record { network = variant { Goerli }; execution_rpc_url = "https://ethereum-goerli.publicnode.com"; consensus_rpc_url = "TODO" }'
 #[update]
 async fn setup(request: SetupRequest) {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
-    helios::start_client(&request.consensus_rpc_url, &request.execution_rpc_url, None)
-        .await
-        .expect("starting client failed");
+    helios::start_client(
+        request.network,
+        &request.consensus_rpc_url,
+        &request.execution_rpc_url,
+        None,
+    )
+    .await
+    .expect("starting client failed");
 
+    save_static_string(&LAST_NETWORK, request.network.to_string());
     save_static_string(&LAST_CONSENSUS_RPC_URL, request.consensus_rpc_url);
     save_static_string(&LAST_EXECUTION_RPC_URL, request.execution_rpc_url);
 }
@@ -94,6 +105,15 @@ async fn post_upgrade() {
     // Client will be started from a timer in a second.
     set_timer(std::time::Duration::from_secs(1), || {
         ic_cdk::spawn(async move {
+            let Some(network) = load_static_string(&LAST_NETWORK) else {
+                return
+            };
+
+            let Ok(network) = network.parse::<Network>() else {
+                error!("Failed to parse network: {network}. Use `setup` to initalize canister.");
+                return
+            };
+
             let Some(consensus_rpc_url) = load_static_string(&LAST_CONSENSUS_RPC_URL) else {
                 return
             };
@@ -105,13 +125,15 @@ async fn post_upgrade() {
             let checkpoint = load_static_string(&LAST_CHECKPOINT);
 
             debug!(
-                "Resuming client with: execution_rpc_url = {}, consensus_rpc_url = {}, checkpoint: {:?}",
+                "Resuming client with: network = {}, execution_rpc_url = {}, consensus_rpc_url = {}, checkpoint: {}",
+                network,
                 &execution_rpc_url,
                 &consensus_rpc_url,
-                &checkpoint
+                &checkpoint.as_deref().unwrap_or("None"),
             );
 
             helios::start_client(
+                network,
                 &consensus_rpc_url,
                 &execution_rpc_url,
                 checkpoint.as_deref(),
