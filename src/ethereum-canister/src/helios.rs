@@ -18,20 +18,30 @@ thread_local! {
     static HELIOS: RefCell<Option<Rc<Client<ConfigDB>>>> = RefCell::new(None);
 }
 
-pub(crate) fn client() -> Rc<Client<ConfigDB>> {
-    HELIOS
-        .with(|helios| helios.borrow().clone())
-        .expect("Client not started")
+pub(crate) fn try_client() -> Option<Rc<Client<ConfigDB>>> {
+    HELIOS.with(|helios| helios.borrow().clone())
 }
 
-pub(crate) async fn start_client(consensus_rpc_url: &str, execution_rpc_url: &str) -> Result<()> {
+pub(crate) fn client() -> Rc<Client<ConfigDB>> {
+    try_client().expect("Client not started")
+}
+
+pub(crate) async fn start_client(
+    consensus_rpc_url: &str,
+    execution_rpc_url: &str,
+    checkpoint: Option<&str>,
+) -> Result<()> {
     if HELIOS.with(|helios| helios.borrow().is_some()) {
         bail!("Client already started");
     }
 
-    let checkpoint = latest_checkpoint(consensus_rpc_url)
-        .await
-        .wrap_err("Fetching latest checkpoint failed")?;
+    let checkpoint = if let Some(checkpoint) = checkpoint {
+        checkpoint.to_owned()
+    } else {
+        fetch_latest_checkpoint(consensus_rpc_url)
+            .await
+            .wrap_err("Fetching latest checkpoint failed")?
+    };
 
     let mut client: Client<ConfigDB> = ClientBuilder::new()
         .network(Network::MAINNET)
@@ -50,6 +60,21 @@ pub(crate) async fn start_client(consensus_rpc_url: &str, execution_rpc_url: &st
     HELIOS.with(|helios| *helios.borrow_mut() = Some(Rc::new(client)));
 
     Ok(())
+}
+
+pub(crate) async fn get_last_checkpoint() -> Option<String> {
+    match try_client() {
+        Some(client) => client.get_last_checkpoint().await,
+        None => None,
+    }
+}
+
+pub(crate) async fn shutdown() {
+    if let Some(client) = try_client() {
+        client.shutdown().await;
+    }
+
+    HELIOS.with(|helios| helios.borrow_mut().take());
 }
 
 pub(crate) async fn call<T, R>(contract: Address, call_data: T) -> Result<R>
@@ -72,7 +97,7 @@ where
     Ok(ret)
 }
 
-async fn latest_checkpoint(consensus_rpc_url: &str) -> Result<String> {
+async fn fetch_latest_checkpoint(consensus_rpc_url: &str) -> Result<String> {
     let checkpoint_url = format!("{consensus_rpc_url}/eth/v1/beacon/headers/finalized");
     let header_resp = http::get(&checkpoint_url)
         .await
