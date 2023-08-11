@@ -552,6 +552,7 @@ dependencies = [
 [[package]]
 name = "client"
 version = "0.4.1"
+source = "git+https://github.com/eigerco/helios?rev=a7173b2#a7173b285eab6cad864c15f43358aba17728aaff"
 dependencies = [
  "common",
  "config",
@@ -584,6 +585,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.4.1"
+source = "git+https://github.com/eigerco/helios?rev=a7173b2#a7173b285eab6cad864c15f43358aba17728aaff"
 dependencies = [
  "candid",
  "ethers-core",
@@ -600,6 +602,7 @@ dependencies = [
 [[package]]
 name = "config"
 version = "0.4.1"
+source = "git+https://github.com/eigerco/helios?rev=a7173b2#a7173b285eab6cad864c15f43358aba17728aaff"
 dependencies = [
  "common",
  "ethers-core",
@@ -620,6 +623,7 @@ dependencies = [
 [[package]]
 name = "consensus"
 version = "0.4.1"
+source = "git+https://github.com/eigerco/helios?rev=a7173b2#a7173b285eab6cad864c15f43358aba17728aaff"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1142,6 +1146,7 @@ checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 [[package]]
 name = "execution"
 version = "0.4.1"
+source = "git+https://github.com/eigerco/helios?rev=a7173b2#a7173b285eab6cad864c15f43358aba17728aaff"
 dependencies = [
  "async-trait",
  "bytes",
