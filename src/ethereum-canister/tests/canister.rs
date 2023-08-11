@@ -13,13 +13,15 @@ fn get_block_number() {
 }
 
 mod erc20 {
+    use interface::{Erc20OwnerOfRequest, U256};
+
     use super::*;
 
     #[test]
     fn balance_of() {
         let canister = TestCanister::setup_ethereum_canister();
 
-        let request = interface::Erc20OwnerOfRequest {
+        let request = Erc20OwnerOfRequest {
             contract: "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdt
                 .parse()
                 .unwrap(),
@@ -27,12 +29,12 @@ mod erc20 {
                 .parse()
                 .unwrap(),
         };
-        let _: (Nat,) = call!(canister, "erc20_balance_of", request).unwrap();
+        let _: (U256,) = call!(canister, "erc20_balance_of", request).unwrap();
     }
 }
 
 mod erc721 {
-    use ethers_core::types::Address;
+    use interface::{Address, Erc721OwnerOfRequest};
 
     use super::*;
 
@@ -40,14 +42,13 @@ mod erc721 {
     fn owner_of() {
         let canister = TestCanister::setup_ethereum_canister();
 
-        let request = interface::Erc721OwnerOfRequest {
+        let request = Erc721OwnerOfRequest {
             contract: "0x5Af0D9827E0c53E4799BB226655A1de152A425a5" // milady
                 .parse()
                 .unwrap(),
             token_id: 7773_u32.into(),
         };
 
-        let owner: (String,) = call!(canister, "erc721_owner_of", request).unwrap();
-        owner.0.parse::<Address>().unwrap();
+        let _: (Address,) = call!(canister, "erc721_owner_of", request).unwrap();
     }
 }
