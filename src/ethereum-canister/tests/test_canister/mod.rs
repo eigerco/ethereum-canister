@@ -93,14 +93,16 @@ impl Drop for TestCanister {
 /// and decodes the results.
 macro_rules! call {
     ($canister:expr, $method:expr, ($($arg:expr),*)) => {{
-        let result = $canister
-            .call($method, ($($arg),*));
+        let result = $canister.call($method, ($($arg),*));
         crate::test_canister::call!(@decode, result)
 
     }};
     ($canister:expr, $method:expr, $arg:expr) => {{
-        let result = $canister
-            .call($method, ($arg,));
+        let result = $canister.call($method, ($arg,));
+        crate::test_canister::call!(@decode, result)
+    }};
+    ($canister:expr, $method:expr) => {{
+        let result = $canister.call($method, ());
         crate::test_canister::call!(@decode, result)
     }};
     (@decode, $result:expr) => {

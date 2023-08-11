@@ -8,7 +8,7 @@ use crate::test_canister::{call, TestCanister};
 fn get_block_number() {
     let canister = TestCanister::setup_ethereum_canister();
 
-    let block_num: (Nat,) = call!(canister, "get_block_number", ()).unwrap();
+    let block_num: (Nat,) = call!(canister, "get_block_number").unwrap();
     assert!(block_num.0 > 17880732u128);
 }
 
