@@ -1,5 +1,10 @@
-use candid::{utils::ArgumentEncoder, IDLArgs};
+use std::process::Command;
+use std::str;
+
+use candid::utils::{encode_args, ArgumentEncoder};
+use candid::IDLArgs;
 use eyre::{ensure, Result, WrapErr};
+use interface::SetupRequest;
 use temp_dir::TempDir;
 
 const DEFAULT_CONSENSUS_RPC: &str = "https://www.lightclientdata.org";
@@ -34,7 +39,7 @@ impl TestCanister {
 
     pub fn call(&self, method: &str, args: impl ArgumentEncoder) -> Result<Vec<u8>> {
         // convert arguments into format understood by `dfx`
-        let args = candid::utils::encode_args(args).wrap_err("encoding args")?;
+        let args = encode_args(args).wrap_err("encoding args")?;
         let args = IDLArgs::from_bytes(&args).wrap_err("decoding dfx args")?;
 
         let stdout = self
@@ -46,7 +51,7 @@ impl TestCanister {
         // note: decoding here to the correct type is not possible as decoding
         //       binds the result's lifetime to the lifetime of output
         //       this is because decoding supports also reference types
-        let stdout = std::str::from_utf8(&stdout).wrap_err("decoding output")?;
+        let stdout = str::from_utf8(&stdout).wrap_err("decoding output")?;
         let output: IDLArgs = stdout.parse().wrap_err("parsing output")?;
         output.to_bytes().wrap_err("encoding to candid")
     }
@@ -59,7 +64,7 @@ impl TestCanister {
     }
 
     fn run_dfx(&self, args: &[&str]) -> Result<Vec<u8>> {
-        let output = std::process::Command::new("dfx")
+        let output = Command::new("dfx")
             .args(args)
             .current_dir(self.temp_dir.path())
             .output()
@@ -67,7 +72,7 @@ impl TestCanister {
         ensure!(
             output.status.success(),
             "dfx {args:?} failed: {}",
-            std::str::from_utf8(&output.stderr)?
+            str::from_utf8(&output.stderr)?
         );
         Ok(output.stdout)
     }
@@ -81,7 +86,7 @@ impl Drop for TestCanister {
 
 pub fn setup_ethereum_canister() -> TestCanister {
     let canister = TestCanister::deploy("ethereum_canister");
-    let request = interface::SetupRequest {
+    let request = SetupRequest {
         consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
         execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
     };
@@ -95,7 +100,6 @@ macro_rules! call {
     ($canister:expr, $method:expr, ($($arg:expr),*)) => {{
         let result = $canister.call($method, ($($arg),*));
         crate::test_canister::call!(@decode, result)
-
     }};
     ($canister:expr, $method:expr, $arg:expr) => {{
         let result = $canister.call($method, ($arg,));
