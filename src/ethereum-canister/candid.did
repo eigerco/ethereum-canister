@@ -1,7 +1,13 @@
 type address = text;
 type u256 = nat;
 
+type network = variant {
+    Mainnet;
+    Goerli;
+};
+
 type setup_request = record {
+    network: network;
     consensus_rpc_url: text;
     execution_rpc_url: text;
 };

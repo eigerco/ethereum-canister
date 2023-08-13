@@ -8,6 +8,7 @@ use ic_stable_structures::{Cell, DefaultMemoryImpl, Storable};
 pub(crate) const LAST_CONSENSUS_RPC_URL_ID: MemoryId = MemoryId::new(0);
 pub(crate) const LAST_EXECUTION_RPC_URL_ID: MemoryId = MemoryId::new(1);
 pub(crate) const LAST_CHECKPOINT_ID: MemoryId = MemoryId::new(2);
+pub(crate) const LAST_NETWORK_ID: MemoryId = MemoryId::new(3);
 
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =

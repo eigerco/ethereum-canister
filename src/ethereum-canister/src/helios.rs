@@ -10,8 +10,9 @@ use helios_client::database::ConfigDB;
 use helios_client::{Client, ClientBuilder};
 use helios_common::http;
 use helios_common::types::BlockTag;
-use helios_config::Network;
+use helios_config::Network as HeliosNetwork;
 use helios_execution::types::CallOpts;
+use interface::Network;
 use serde_json::Value;
 
 thread_local! {
@@ -27,6 +28,7 @@ pub(crate) fn client() -> Rc<Client<ConfigDB>> {
 }
 
 pub(crate) async fn start_client(
+    network: Network,
     consensus_rpc_url: &str,
     execution_rpc_url: &str,
     checkpoint: Option<&str>,
@@ -34,6 +36,11 @@ pub(crate) async fn start_client(
     if HELIOS.with(|helios| helios.borrow().is_some()) {
         bail!("Client already started");
     }
+
+    let network = match network {
+        Network::Mainnet => HeliosNetwork::MAINNET,
+        Network::Goerli => HeliosNetwork::GOERLI,
+    };
 
     let checkpoint = if let Some(checkpoint) = checkpoint {
         checkpoint.to_owned()
@@ -44,7 +51,7 @@ pub(crate) async fn start_client(
     };
 
     let mut client: Client<ConfigDB> = ClientBuilder::new()
-        .network(Network::MAINNET)
+        .network(network)
         .consensus_rpc(consensus_rpc_url)
         .execution_rpc(execution_rpc_url)
         .checkpoint(&checkpoint)
