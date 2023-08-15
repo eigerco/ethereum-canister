@@ -1,5 +1,2 @@
 [build]
 target = "wasm32-unknown-unknown"
-
-[test]
-target = "x86_64-unknown-linux-gnu"
