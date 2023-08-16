@@ -4,7 +4,7 @@ use std::str;
 use candid::utils::{encode_args, ArgumentEncoder};
 use candid::IDLArgs;
 use eyre::{ensure, Result, WrapErr};
-use interface::SetupRequest;
+use interface::{Network, SetupRequest};
 use temp_dir::TempDir;
 
 const DEFAULT_CONSENSUS_RPC: &str = "https://www.lightclientdata.org";
@@ -87,6 +87,7 @@ impl Drop for TestCanister {
 pub fn setup_ethereum_canister() -> TestCanister {
     let canister = TestCanister::deploy("ethereum_canister");
     let request = SetupRequest {
+        network: Network::Mainnet,
         consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
         execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
     };
