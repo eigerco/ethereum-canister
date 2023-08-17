@@ -12,6 +12,15 @@ type setup_request = record {
     execution_rpc_url: text;
 };
 
+type estimate_gas_request = record {
+    from: opt address;
+    to: opt address;
+    gas: opt u256;
+    gas_price: opt u256;
+    value: opt u256;
+    data: opt blob;
+};
+
 type erc20_balance_of_request = record {
     contract: address;
     account: address;
@@ -24,7 +33,12 @@ type erc721_owner_of_request = record {
 
 service : {
     "setup": (setup_request) -> ();
+
     "get_block_number": () -> (nat) query;
+
+    "get_gas_price": () -> (u256) query;
+
+    "estimate_gas": (estimate_gas_request) -> (u256);
 
     "erc20_balance_of": (erc20_balance_of_request) -> (u256);
 
