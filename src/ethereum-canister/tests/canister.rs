@@ -13,7 +13,7 @@ fn get_block_number() {
 }
 
 mod erc20 {
-    use interface::{Erc20OwnerOfRequest, U256};
+    use interface::{Erc20BalanceOfRequest, U256};
 
     use super::*;
 
@@ -21,7 +21,7 @@ mod erc20 {
     fn balance_of() {
         let canister = setup_ethereum_canister();
 
-        let request = Erc20OwnerOfRequest {
+        let request = Erc20BalanceOfRequest {
             contract: "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdt
                 .parse()
                 .unwrap(),

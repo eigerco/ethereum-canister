@@ -19,7 +19,7 @@ pub struct SetupRequest {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
-pub struct Erc20OwnerOfRequest {
+pub struct Erc20BalanceOfRequest {
     pub contract: Address,
     pub account: Address,
 }
