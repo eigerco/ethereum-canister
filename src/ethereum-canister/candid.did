@@ -14,10 +14,11 @@ type setup_request = record {
 
 type estimate_gas_request = record {
     from: opt address;
-    to: opt address;
-    gas: opt u256;
+    to: address;
+    gas_limit: opt u256;
     gas_price: opt u256;
     value: opt u256;
+    // Hash of the method signature and encoded parameters. See the Ethereum contract ABI specification.
     data: opt blob;
 };
 

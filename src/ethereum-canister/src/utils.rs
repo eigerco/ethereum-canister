@@ -24,7 +24,7 @@ impl IntoCallOpts for EstimateGasRequest {
     fn into_call_opts(self) -> CallOpts {
         CallOpts {
             from: self.from.map(Into::into),
-            to: self.to.map(Into::into),
+            to: Some(self.to.into()),
             gas: self.gas_limit.map(Into::into),
             gas_price: self.gas_price.map(Into::into),
             value: self.value.map(Into::into),

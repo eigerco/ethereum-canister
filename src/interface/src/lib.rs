@@ -28,10 +28,10 @@ pub struct Erc721OwnerOfRequest {
     pub token_id: U256,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]
 pub struct EstimateGasRequest {
     pub from: Option<Address>,
-    pub to: Option<Address>,
+    pub to: Address,
     pub gas_limit: Option<U256>,
     pub gas_price: Option<U256>,
     pub value: Option<U256>,

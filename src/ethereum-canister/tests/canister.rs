@@ -33,13 +33,14 @@ fn estimate_gas() {
             .unwrap(),
     };
     let request = EstimateGasRequest {
-        to: Some(
-            "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdt
-                .parse()
-                .unwrap(),
-        ),
+        from: None,
+        to: "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdt
+            .parse()
+            .unwrap(),
+        gas_limit: None,
+        gas_price: None,
+        value: None,
         data: Some(erc20_balance_of.encode()),
-        ..Default::default()
     };
 
     let gas: (Nat,) = call!(canister, "estimate_gas", request).unwrap();
