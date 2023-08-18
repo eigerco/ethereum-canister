@@ -3,7 +3,9 @@ use std::cell::RefCell;
 use candid::Nat;
 use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
 use ic_cdk_timers::set_timer;
-use interface::{Address, Erc20OwnerOfRequest, Erc721OwnerOfRequest, Network, SetupRequest, U256};
+use interface::{
+    Address, Erc20BalanceOfRequest, Erc721OwnerOfRequest, Network, SetupRequest, U256,
+};
 use log::{debug, error};
 
 use crate::stable_memory::{
@@ -70,7 +72,7 @@ async fn get_block_number() -> Nat {
 }
 
 #[update]
-async fn erc20_balance_of(request: Erc20OwnerOfRequest) -> U256 {
+async fn erc20_balance_of(request: Erc20BalanceOfRequest) -> U256 {
     erc20::balance_of(request.contract.into(), request.account.into())
         .await
         .expect("erc20::balance_of failed")
