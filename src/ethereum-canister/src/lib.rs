@@ -4,7 +4,8 @@ use candid::Nat;
 use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
 use ic_cdk_timers::set_timer;
 use interface::{
-    Address, Erc20BalanceOfRequest, Erc721OwnerOfRequest, Network, SetupRequest, U256,
+    Address, Erc20BalanceOfRequest, Erc721OwnerOfRequest, EstimateGasRequest, Network,
+    SetupRequest, U256,
 };
 use log::{debug, error};
 
@@ -12,6 +13,7 @@ use crate::stable_memory::{
     init_stable_cell_default, load_static_string, save_static_string, StableCell,
     LAST_CHECKPOINT_ID, LAST_CONSENSUS_RPC_URL_ID, LAST_EXECUTION_RPC_URL_ID, LAST_NETWORK_ID,
 };
+use crate::utils::IntoCallOpts;
 
 mod erc20;
 mod erc721;
@@ -69,6 +71,27 @@ async fn get_block_number() -> Nat {
         .expect("get_block_number failed");
 
     head_block_num.into()
+}
+
+#[query]
+async fn get_gas_price() -> U256 {
+    let helios = helios::client();
+
+    let gas_price = helios.get_gas_price().await.expect("get_gas_price failed");
+
+    gas_price.into()
+}
+
+#[update]
+async fn estimate_gas(request: EstimateGasRequest) -> U256 {
+    let helios = helios::client();
+
+    let gas_cost_estimation = helios
+        .estimate_gas(&request.into_call_opts())
+        .await
+        .expect("estimate_gas failed");
+
+    gas_cost_estimation.into()
 }
 
 #[update]
