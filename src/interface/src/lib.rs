@@ -14,6 +14,7 @@ pub struct SetupRequest {
     pub network: Network,
     pub consensus_rpc_url: String,
     pub execution_rpc_url: String,
+    pub checkpoint: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, CandidType, Deserialize)]

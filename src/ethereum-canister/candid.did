@@ -10,6 +10,7 @@ type setup_request = record {
     network: network;
     consensus_rpc_url: text;
     execution_rpc_url: text;
+    checkpoint: opt text;
 };
 
 type estimate_gas_request = record {

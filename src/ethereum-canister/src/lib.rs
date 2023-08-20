@@ -51,7 +51,7 @@ async fn setup(request: SetupRequest) {
         request.network,
         &request.consensus_rpc_url,
         &request.execution_rpc_url,
-        None,
+        request.checkpoint.as_deref(),
     )
     .await
     .expect("starting client failed");

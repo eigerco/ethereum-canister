@@ -90,6 +90,7 @@ pub fn setup_ethereum_canister() -> TestCanister {
         network: Network::Mainnet,
         consensus_rpc_url: DEFAULT_CONSENSUS_RPC.to_owned(),
         execution_rpc_url: DEFAULT_EXECUTION_RPC.to_owned(),
+        checkpoint: None,
     };
     let _: () = call!(canister, "setup", request).unwrap();
     canister
