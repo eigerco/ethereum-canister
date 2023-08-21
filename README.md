@@ -232,6 +232,11 @@ Another avenue to explore is determining the additional required slots for EVM e
 comprehensive list of missing addresses from revm in a single instance—without resimulation—could be pursued, albeit this might entail modifications in revm.
 Depending on the outcomes, this might lead to a potential reduction in the number of calls from 5 down to 3 or possibly even 2.
 
+If any of the urls provided as a configuration for the canister leads to the http redirections (eg. "https://www.lightclientdata.org" results in redirects), then all
+the https outcalls will be repeated for the original url and then for the redirected on. Supporting redirections can be useful when self hosting nodes for this project,
+so it would be good to optimize it in a way it first checks for the redirections and then storing the actual final url for the requests. The original url can then be kept
+as a fallback url in case the redirected one is no longer valid.
+
 ### Canister 
 
 The initial development was mainly focused on getting the `helios` and `ethers` to the point where they operate correctly in the ICP environment.
