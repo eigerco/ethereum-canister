@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use candid::Nat;
 use ic_cdk::{init, post_upgrade, pre_upgrade, query, update};
 use ic_cdk_timers::set_timer;
@@ -10,8 +8,8 @@ use interface::{
 use log::{debug, error};
 
 use crate::stable_memory::{
-    init_stable_cell_default, load_static_string, save_static_string, StableCell,
-    LAST_CHECKPOINT_ID, LAST_CONSENSUS_RPC_URL_ID, LAST_EXECUTION_RPC_URL_ID, LAST_NETWORK_ID,
+    init_stable_cell_default, StableCell, StableStatic, LAST_CHECKPOINT_ID,
+    LAST_CONSENSUS_RPC_URL_ID, LAST_EXECUTION_RPC_URL_ID, LAST_NETWORK_ID,
 };
 use crate::utils::IntoCallOpts;
 
@@ -23,10 +21,10 @@ mod stable_memory;
 mod utils;
 
 thread_local! {
-    static LAST_NETWORK: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_NETWORK_ID));
-    static LAST_CONSENSUS_RPC_URL: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_CONSENSUS_RPC_URL_ID));
-    static LAST_EXECUTION_RPC_URL: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_EXECUTION_RPC_URL_ID));
-    static LAST_CHECKPOINT: RefCell<StableCell<String>> = RefCell::new(init_stable_cell_default(LAST_CHECKPOINT_ID));
+    static LAST_NETWORK: StableCell<String> = init_stable_cell_default(LAST_NETWORK_ID);
+    static LAST_CONSENSUS_RPC_URL: StableCell<String> = init_stable_cell_default(LAST_CONSENSUS_RPC_URL_ID);
+    static LAST_EXECUTION_RPC_URL: StableCell<String> = init_stable_cell_default(LAST_EXECUTION_RPC_URL_ID);
+    static LAST_CHECKPOINT: StableCell<String> = init_stable_cell_default(LAST_CHECKPOINT_ID);
 }
 
 #[init]
@@ -56,9 +54,9 @@ async fn setup(request: SetupRequest) {
     .await
     .expect("starting client failed");
 
-    save_static_string(&LAST_NETWORK, request.network.to_string());
-    save_static_string(&LAST_CONSENSUS_RPC_URL, request.consensus_rpc_url);
-    save_static_string(&LAST_EXECUTION_RPC_URL, request.execution_rpc_url);
+    LAST_NETWORK.store(request.network.to_string());
+    LAST_CONSENSUS_RPC_URL.store(request.consensus_rpc_url);
+    LAST_EXECUTION_RPC_URL.store(request.execution_rpc_url);
 }
 
 #[query]
@@ -115,7 +113,7 @@ async fn pre_upgrade() {
     debug!("Stopping client");
 
     let checkpoint = helios::get_last_checkpoint().await;
-    save_static_string(&LAST_CHECKPOINT, checkpoint);
+    LAST_CHECKPOINT.store(checkpoint);
 
     helios::shutdown().await;
 
@@ -130,7 +128,7 @@ async fn post_upgrade() {
     // Client will be started from a timer in a second.
     set_timer(std::time::Duration::from_secs(1), || {
         ic_cdk::spawn(async move {
-            let Some(network) = load_static_string(&LAST_NETWORK) else {
+            let Some(network) = LAST_NETWORK.load() else {
                 return
             };
 
@@ -139,15 +137,15 @@ async fn post_upgrade() {
                 return
             };
 
-            let Some(consensus_rpc_url) = load_static_string(&LAST_CONSENSUS_RPC_URL) else {
+            let Some(consensus_rpc_url) = LAST_CONSENSUS_RPC_URL.load() else {
                 return
             };
 
-            let Some(execution_rpc_url) = load_static_string(&LAST_EXECUTION_RPC_URL) else {
+            let Some(execution_rpc_url) = LAST_EXECUTION_RPC_URL.load() else {
                 return
             };
 
-            let checkpoint = load_static_string(&LAST_CHECKPOINT);
+            let checkpoint = LAST_CHECKPOINT.load();
 
             debug!(
                 "Resuming client with: network = {}, execution_rpc_url = {}, consensus_rpc_url = {}, checkpoint: {}",

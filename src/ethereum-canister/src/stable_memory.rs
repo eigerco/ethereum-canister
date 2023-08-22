@@ -15,7 +15,7 @@ thread_local! {
         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 }
 
-pub(crate) type StableCell<T> = Cell<T, VirtualMemory<DefaultMemoryImpl>>;
+pub(crate) type StableCell<T> = RefCell<Cell<T, VirtualMemory<DefaultMemoryImpl>>>;
 
 pub(crate) fn memory_of(id: MemoryId) -> VirtualMemory<DefaultMemoryImpl> {
     MEMORY_MANAGER.with(|mngr| mngr.borrow().get(id))
@@ -27,7 +27,9 @@ pub(crate) fn init_stable_cell<T>(id: MemoryId, value: T) -> StableCell<T>
 where
     T: Storable,
 {
-    StableCell::init(memory_of(id), value).expect("failed to initialize StableCell")
+    let inner_cell = Cell::<T, VirtualMemory<DefaultMemoryImpl>>::init(memory_of(id), value)
+        .expect("failed to initialize StableCell");
+    RefCell::new(inner_cell)
 }
 
 /// If memory of `id` is already initialized then that content will be used, otherwise it is
@@ -39,27 +41,48 @@ where
     init_stable_cell(id, T::default())
 }
 
-pub(crate) fn save_static_string(
-    cell: &'static LocalKey<RefCell<StableCell<String>>>,
-    s: impl Into<Option<String>>,
-) {
-    let s = s.into();
-
-    cell.with(|val| {
-        val.borrow_mut()
-            .set(s.unwrap_or_default())
-            .expect("failed to save string")
-    });
+pub trait StableStatic<T> {
+    fn store(&'static self, val: impl Into<Option<T>>);
+    fn load(&'static self) -> Option<T>;
 }
 
-pub(crate) fn load_static_string(
-    cell: &'static LocalKey<RefCell<StableCell<String>>>,
-) -> Option<String> {
-    let s = cell.with(|val| val.borrow().get().clone());
+impl<T> StableStatic<T> for LocalKey<StableCell<T>>
+where
+    T: Clone + Default + Storable + IsEmpty,
+{
+    fn store(&'static self, val: impl Into<Option<T>>) {
+        let val = val.into();
 
-    if s.is_empty() {
-        None
-    } else {
-        Some(s)
+        self.with(|cell| {
+            cell.borrow_mut()
+                .set(val.unwrap_or_default())
+                .expect("failed to store value")
+        });
+    }
+
+    fn load(&'static self) -> Option<T> {
+        let val = self.with(|cell| cell.borrow().get().clone());
+
+        if val.is_empty() {
+            None
+        } else {
+            Some(val)
+        }
+    }
+}
+
+trait IsEmpty {
+    fn is_empty(&self) -> bool;
+}
+
+impl IsEmpty for String {
+    fn is_empty(&self) -> bool {
+        String::is_empty(self)
+    }
+}
+
+impl IsEmpty for Vec<u8> {
+    fn is_empty(&self) -> bool {
+        Vec::is_empty(self)
     }
 }
