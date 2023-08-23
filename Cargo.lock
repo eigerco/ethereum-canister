@@ -1071,8 +1071,9 @@ dependencies = [
 
 [[package]]
 name = "ethers-contract"
-version = "2.0.8"
-source = "git+https://github.com/gakonst/ethers-rs?rev=179891d#179891d45cc7b50941f2b8c30b206355ab76d94c"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02bb80fd2c22631a5eb8a02cbf373cc5fd86937fc966bb670b9a884580c8e71c"
 dependencies = [
  "const-hex",
  "ethers-contract-abigen",
@@ -1088,8 +1089,9 @@ dependencies = [
 
 [[package]]
 name = "ethers-contract-abigen"
-version = "2.0.8"
-source = "git+https://github.com/gakonst/ethers-rs?rev=179891d#179891d45cc7b50941f2b8c30b206355ab76d94c"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22c54db0d393393e732a5b20273e4f8ab89f0cce501c84e75fab9c126799a6e6"
 dependencies = [
  "Inflector",
  "const-hex",
@@ -1109,8 +1111,9 @@ dependencies = [
 
 [[package]]
 name = "ethers-contract-derive"
-version = "2.0.8"
-source = "git+https://github.com/gakonst/ethers-rs?rev=179891d#179891d45cc7b50941f2b8c30b206355ab76d94c"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62ee4f216184a1304b707ed258f4f70aa40bf7e1522ab8963d127a8d516eaa1a"
 dependencies = [
  "Inflector",
  "const-hex",
@@ -1124,8 +1127,9 @@ dependencies = [
 
 [[package]]
 name = "ethers-core"
-version = "2.0.8"
-source = "git+https://github.com/gakonst/ethers-rs?rev=179891d#179891d45cc7b50941f2b8c30b206355ab76d94c"
+version = "2.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c29523f73c12753165781c6e5dc11c84d3e44c080a15f7c6cfbd70b514cb6f1"
 dependencies = [
  "arrayvec 0.7.4",
  "bytes",
@@ -3863,9 +3867,9 @@ checksum = "af547b166dd1ea4b472165569fc456cfb6818116f854690b0ff205e636523dab"
 
 [[package]]
 name = "tempfile"
-version = "3.7.0"
+version = "3.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5486094ee78b2e5038a6382ed7645bc084dc2ec433426ca4c3cb61e2007b8998"
+checksum = "cb94d2f3cc536af71caac6b6fcebf65860b347e7ce0cc9ebe8f70d3e521054ef"
 dependencies = [
  "cfg-if",
  "fastrand",

@@ -4,10 +4,10 @@ resolver = "2"
 
 [workspace.dependencies]
 contracts-abi = { path = "src/contracts-abi" }
-ethers-contract = { version = "2.0.8", default-features = false, features = [
+ethers-contract = { version = "2.0.9", default-features = false, features = [
   "abigen",
 ] }
-ethers-core = "2.0.8"
+ethers-core = "2.0.9"
 eyre = "0.6.8"
 helios_client = { package = "client", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
 helios_common = { package = "common", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
@@ -19,10 +19,3 @@ interface = { path = "src/interface" }
 opt-level = "z"
 lto = true
 codegen-units = 1
-
-[patch.crates-io]
-# needed before ethers release a next version (current 2.0.8)
-ethers-contract = { git = "https://github.com/gakonst/ethers-rs", rev = "179891d" }
-ethers-contract-abigen = { git = "https://github.com/gakonst/ethers-rs", rev = "179891d" }
-ethers-contract-derive = { git = "https://github.com/gakonst/ethers-rs", rev = "179891d" }
-ethers-core = { git = "https://github.com/gakonst/ethers-rs", rev = "179891d" }
