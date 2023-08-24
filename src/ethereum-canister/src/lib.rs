@@ -62,22 +62,19 @@ async fn setup(request: SetupRequest) {
 }
 
 #[query]
-async fn get_block_number() -> Nat {
+fn get_block_number() -> Nat {
     let helios = helios::client();
 
-    let head_block_num = helios
-        .get_block_number()
-        .await
-        .expect("get_block_number failed");
+    let head_block_num = helios.get_block_number().expect("get_block_number failed");
 
     head_block_num.into()
 }
 
 #[query]
-async fn get_gas_price() -> U256 {
+fn get_gas_price() -> U256 {
     let helios = helios::client();
 
-    let gas_price = helios.get_gas_price().await.expect("get_gas_price failed");
+    let gas_price = helios.get_gas_price().expect("get_gas_price failed");
 
     gas_price.into()
 }
@@ -114,7 +111,7 @@ async fn erc721_owner_of(request: Erc721OwnerOfRequest) -> Address {
 async fn pre_upgrade() {
     debug!("Stopping client");
 
-    let checkpoint = helios::get_last_checkpoint().await;
+    let checkpoint = helios::get_last_checkpoint();
     save_static_string(&LAST_CHECKPOINT, checkpoint);
 
     helios::shutdown().await;
@@ -123,7 +120,7 @@ async fn pre_upgrade() {
 }
 
 #[post_upgrade]
-async fn post_upgrade() {
+fn post_upgrade() {
     let _ = ic_logger::init_with_level(log::Level::Trace);
 
     // Workaround because cross-canister calls are not allowed in post_upgrade.
