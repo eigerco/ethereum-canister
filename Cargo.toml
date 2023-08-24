@@ -9,13 +9,20 @@ ethers-contract = { version = "2.0.9", default-features = false, features = [
 ] }
 ethers-core = "2.0.9"
 eyre = "0.6.8"
-helios_client = { package = "client", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
-helios_common = { package = "common", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
-helios_config = { package = "config", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
-helios_execution = { package = "execution", git = "https://github.com/eigerco/helios", rev = "07cc7af" }
+helios_client = { package = "client", git = "https://github.com/eigerco/helios", rev = "62c7237" }
+helios_common = { package = "common", git = "https://github.com/eigerco/helios", rev = "62c7237" }
+helios_config = { package = "config", git = "https://github.com/eigerco/helios", rev = "62c7237" }
+helios_execution = { package = "execution", git = "https://github.com/eigerco/helios", rev = "62c7237" }
 interface = { path = "src/interface" }
 
 [profile.release]
 opt-level = "z"
 lto = true
 codegen-units = 1
+
+# Uncomment to apply local changes of Helios
+#[patch.'https://github.com/eigerco/helios']
+#client = { path = "../helios/client" }
+#common = { path = "../helios/common" }
+#config = { path = "../helios/config" }
+#execution = { path = "../helios/execution" }

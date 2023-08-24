@@ -80,6 +80,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b13c32d80ecc7ab747b80c3784bce54ee8a7a0cc4fbda9bf4cda2cf6fe90854"
 
 [[package]]
+name = "arc-swap"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bddcadddf5e9015d310179a59bb28c4d4b9920ad0f11e8e14dbadf654890c9a6"
+
+[[package]]
 name = "ark-ff"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -552,8 +558,9 @@ dependencies = [
 [[package]]
 name = "client"
 version = "0.4.1"
-source = "git+https://github.com/eigerco/helios?rev=07cc7af#07cc7af979219c4d4880910cd903af0a39a038db"
+source = "git+https://github.com/eigerco/helios?rev=62c7237#62c7237c592025c028a32046a766c2b6780d114e"
 dependencies = [
+ "arc-swap",
  "common",
  "config",
  "consensus",
@@ -585,7 +592,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.4.1"
-source = "git+https://github.com/eigerco/helios?rev=07cc7af#07cc7af979219c4d4880910cd903af0a39a038db"
+source = "git+https://github.com/eigerco/helios?rev=62c7237#62c7237c592025c028a32046a766c2b6780d114e"
 dependencies = [
  "candid",
  "ethers-core",
@@ -602,7 +609,7 @@ dependencies = [
 [[package]]
 name = "config"
 version = "0.4.1"
-source = "git+https://github.com/eigerco/helios?rev=07cc7af#07cc7af979219c4d4880910cd903af0a39a038db"
+source = "git+https://github.com/eigerco/helios?rev=62c7237#62c7237c592025c028a32046a766c2b6780d114e"
 dependencies = [
  "common",
  "ethers-core",
@@ -623,7 +630,7 @@ dependencies = [
 [[package]]
 name = "consensus"
 version = "0.4.1"
-source = "git+https://github.com/eigerco/helios?rev=07cc7af#07cc7af979219c4d4880910cd903af0a39a038db"
+source = "git+https://github.com/eigerco/helios?rev=62c7237#62c7237c592025c028a32046a766c2b6780d114e"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1164,7 +1171,7 @@ checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 [[package]]
 name = "execution"
 version = "0.4.1"
-source = "git+https://github.com/eigerco/helios?rev=07cc7af#07cc7af979219c4d4880910cd903af0a39a038db"
+source = "git+https://github.com/eigerco/helios?rev=62c7237#62c7237c592025c028a32046a766c2b6780d114e"
 dependencies = [
  "async-trait",
  "bytes",

@@ -69,9 +69,9 @@ pub(crate) async fn start_client(
     Ok(())
 }
 
-pub(crate) async fn get_last_checkpoint() -> Option<String> {
+pub(crate) fn get_last_checkpoint() -> Option<String> {
     match try_client() {
-        Some(client) => client.get_last_checkpoint().await,
+        Some(client) => client.get_last_checkpoint(),
         None => None,
     }
 }
