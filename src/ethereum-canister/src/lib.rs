@@ -128,20 +128,20 @@ fn post_upgrade() {
     set_timer(std::time::Duration::from_secs(1), || {
         ic_cdk::spawn(async move {
             let Some(network) = load_static_string(&LAST_NETWORK) else {
-                return
+                return;
             };
 
             let Ok(network) = network.parse::<Network>() else {
                 error!("Failed to parse network: {network}. Use `setup` to initalize canister.");
-                return
+                return;
             };
 
             let Some(consensus_rpc_url) = load_static_string(&LAST_CONSENSUS_RPC_URL) else {
-                return
+                return;
             };
 
             let Some(execution_rpc_url) = load_static_string(&LAST_EXECUTION_RPC_URL) else {
-                return
+                return;
             };
 
             let checkpoint = load_static_string(&LAST_CHECKPOINT);
