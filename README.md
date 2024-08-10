@@ -257,7 +257,7 @@ The milestones in the roadmap have been completed. This project was completed wi
 
 ## About [Eiger](https://www.eiger.co)
 
-We are engineers. We contribute to various ecosystems by building low level implementations and core components. We built this integration because we belive in Ethereum and Internet Computer and wanted to build verifyable cross-chain communication between the too.
+We are engineers. We contribute to various ecosystems by building low level implementations and core components. We built this integration because we belive in Ethereum, Internet Computer and wanted to build verifyable cross-chain communication between the two.
 
 Contact us at hello@eiger.co
 Follow us on [X/Twitter](https://x.com/eiger_co)
