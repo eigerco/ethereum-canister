@@ -252,3 +252,10 @@ Also exposing the full helios API and seeking community input sounds like a neat
 [Milestones](https://github.com/eigerco/ethereum-canister/milestones)
 
 [Roadmap](https://github.com/orgs/eigerco/projects/11/views/2)
+
+## About [Eiger](https://www.eiger.co)
+
+We are engineers. We contribute to various ecosystems by building low level implementations and core components. We built this integration because we belive in Ethereum and Internet Computer and wanted to build verifyable cross-chain communication between the too.
+
+Contact us at hello@eiger.co
+Follow us on [X/Twitter](https://x.com/eiger_co)
