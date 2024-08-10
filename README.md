@@ -1,8 +1,10 @@
 # Ethereum Canister
 
-The Ethereum canister offers a secure and trustless way to access Ethereum blockchain data within the internet-computer ecosystem.
-Behind the scenes, it leverages the [`helios`](https://github.com/a16z/helios) light Ethereum client.
+The Ethereum canister offers a secure and trustless way to access Ethereum blockchain data within the Internet Computer ecosystem.
+Behind the scenes, it leverages our [fork](https://github.com/eigerco/helios) of the [`helios`](https://github.com/a16z/helios) light Ethereum client.
 This client is equipped with the capability to validate the authenticity of fetched data.
+
+Read more about this project [on our blog](https://www.eiger.co/blog/icp-light-client)
 
 ## Running and using the Ethereum canister
 
