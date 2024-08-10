@@ -1,6 +1,6 @@
 # Ethereum Canister
 
-The Ethereum canister offers a secure and trustless way to access Ethereum blockchain data within the Internet Computer ecosystem.
+The Ethereum canister offers a secure and trustless way to access Ethereum blockchain data within the [Internet Computer](https://internetcomputer.org/) ecosystem.
 Behind the scenes, it leverages our [fork](https://github.com/eigerco/helios) of the [`helios`](https://github.com/a16z/helios) light Ethereum client.
 This client is equipped with the capability to validate the authenticity of fetched data.
 
@@ -247,11 +247,13 @@ API design, handling payments, and guarding some methods from public usage.
 
 Also exposing the full helios API and seeking community input sounds like a neat idea.
 
-## Roadmap
+## Project & Roadmap
 
 [Milestones](https://github.com/eigerco/ethereum-canister/milestones)
 
 [Roadmap](https://github.com/orgs/eigerco/projects/11/views/2)
+
+The milestones in the roadmap have been completed. This project was completed with support from Dfinity and the Internet Computer community.
 
 ## About [Eiger](https://www.eiger.co)
 
